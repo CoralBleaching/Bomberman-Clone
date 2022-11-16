@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import entity.Player;
 import entity.BackgroundTile;
 import entity.Block;
+import entity.BreakableTile;
 //import entity.BreakableTile;
 import entity.SolidTile;
 
@@ -24,7 +25,8 @@ public class Stage {
         inputHandler = inputHandler_;
 
         player = new Player(this, gamePanel, inputHandler);
-        String map = buildMap();
+        //String map = buildMap();
+        String map = testMap();
 
         //backgroundTiles = new BackgroundTile[gamePanel.kMaxScreenRows * gamePanel.kMaxScreenColumns];
         tiles = new Block[gamePanel.getMaxScreenRows() * gamePanel.getMaxScreenColumns()];     
@@ -37,6 +39,10 @@ public class Stage {
                 if (map.charAt(pos) == 'w')
                 {
                     tiles[pos] = new SolidTile(gamePanel, j * gamePanel.getTileSize(), i * gamePanel.getTileSize());
+                }
+                else if (map.charAt(pos) == 'o')
+                {
+                    tiles[pos] = new BreakableTile(gamePanel, j * gamePanel.getTileSize(), i * gamePanel.getTileSize());
                 }
                 else
                 {
@@ -89,4 +95,24 @@ public class Stage {
         return tiles;
     }
 
+    private String testMap()
+    {
+        String testMap = String.join("",
+        "wwwwwwwwwwwwwww",
+        "w oo          w",
+        "w wow w w w w w",
+        "w ooooo       w",
+        "w w wow wow w w",
+        "w    o   o    w",
+        "w w wow wow w w",
+        "w    oooooo   w",
+        "w w wow w w w w",
+        "w             w",
+        "w w w w w w w w",
+        "w             w",
+        "w w w w w w w w",
+        "w             w",
+        "wwwwwwwwwwwwwww");
+        return testMap;
+    }
 }

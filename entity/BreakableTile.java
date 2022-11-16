@@ -8,6 +8,7 @@ public class BreakableTile extends Block {
 
     public BreakableTile(GamePanel gamePanel, int x, int y) {
         super(gamePanel, spritePath, x, y);
+        collisionBox.shape = Shape.rectangle;
     }
 
     @Override

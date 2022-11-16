@@ -51,25 +51,26 @@ public class Player extends Character {
             direction = Direction.UP;
             y -= speed;
         }
-        else if (inputHandler.down)
+        if (inputHandler.down)
         {
             direction = Direction.DOWN;
             y += speed;
         }
-        else if (inputHandler.right)
+        updateCollisionBox();
+        if (checkForCollisions()) {y = oldy; }
+        if (inputHandler.right)
         {
             direction = Direction.RIGHT;
             x += speed;
         }
-        else if (inputHandler.left)
+        if (inputHandler.left)
         {
             direction = Direction.LEFT;
             x -= speed;
         }
-
         updateCollisionBox();
+        if (checkForCollisions()) {x = oldx; }
         updateLocation();
-        if (checkForCollisions()) { x = oldx; y = oldy; }
     }
 
     @Override

@@ -60,8 +60,8 @@ public class collisionHandler {
         double radius = rightBox.width / 2 * scaler;
 
         // Approaching from past the equator
-        if (leftBox.y > rightBox.y + rightBox.height * (3/4)) ay = leftBox.y;
-        else if (leftBox.y > rightBox.y + rightBox.height * (1/4)) ay = leftBox.y + leftBox.height;
+        if (leftBox.y > rightBox.y + rightBox.height * (3./4)) ay = leftBox.y;
+        else if (leftBox.y > rightBox.y + rightBox.height * (1./4)) ay = leftBox.y + leftBox.height;
         else return true;
         
         double distance = euclideanDistance(ax, ay, centerX, centerY);
@@ -80,8 +80,9 @@ public class collisionHandler {
         double radius = leftBox.width / 2 * scaler;
 
         // Approaching from past the equator
-        if (rightBox.y > leftBox.y + leftBox.height * (3/4)) ay = rightBox.y;
-        else if (rightBox.y > leftBox.y + leftBox.height * (1/4)) ay = rightBox.y + rightBox.height;
+        System.out.println(rightBox.y + " " + (leftBox.y + leftBox.height * (3./4)));
+        if (rightBox.y > leftBox.y + leftBox.height * (3./4)) ay = rightBox.y;
+        else if (rightBox.y > leftBox.y + leftBox.height * (1./4)) ay = rightBox.y + rightBox.height;
         else return true;
         
         double distance = euclideanDistance(ax, ay, centerX, centerY);
@@ -100,8 +101,8 @@ public class collisionHandler {
         double radius = bottomBox.width / 2 * scaler;
 
         // Approaching from past the equator
-        if (topBox.x > bottomBox.x + bottomBox.width * (3/4)) ax = topBox.x;
-        else if (topBox.x > bottomBox.x + bottomBox.width * (1/4)) ax = topBox.x + topBox.width;
+        if (topBox.x > bottomBox.x + bottomBox.width * (3./4)) ax = topBox.x;
+        else if (topBox.x > bottomBox.x + bottomBox.width * (1./4)) ax = topBox.x + topBox.width;
         else return true;
         
         double distance = euclideanDistance(ax, ay, centerX, centerY);
@@ -120,8 +121,8 @@ public class collisionHandler {
         double radius = topBox.width / 2 * scaler;
 
         // Approaching from past the equator
-        if (bottomBox.x > topBox.x + topBox.width * (3/4)) ax = bottomBox.x;
-        else if (bottomBox.x > topBox.x + topBox.width * (1/4)) ax = bottomBox.x + bottomBox.width;
+        if (bottomBox.x > topBox.x + topBox.width * (3./4)) ax = bottomBox.x;
+        else if (bottomBox.x > topBox.x + topBox.width * (1./4)) ax = bottomBox.x + bottomBox.width;
         else return true;
         
         double distance = euclideanDistance(ax, ay, centerX, centerY);
