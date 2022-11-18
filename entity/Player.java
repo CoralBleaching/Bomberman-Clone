@@ -4,6 +4,7 @@ import main.GamePanel;
 import main.InputHandler;
 import main.Stage;
 import main.collisionHandler;
+import main.collisionHandler.Vector2D;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -12,6 +13,7 @@ import java.awt.Graphics2D;
 public class Player extends Character {
     private InputHandler inputHandler;
 
+    private final static int nPlayerStartingSpeed = 3;
     private final static int nPlayerSpritesNumber = 8;
     private final static String sSpritesPath = "resources/player/"; 
 
@@ -20,16 +22,18 @@ public class Player extends Character {
     private static int nPlayerStartingWidth = 68;
     private static int nPlayerStartingHeight = 128;
 
+    private final double fSqrt2 = Math.sqrt(2.);
+
     public Player(Stage stage, GamePanel gamePanel, InputHandler inputHandler)
     {
         super(stage, gamePanel, sSpritesPath, nPlayerSpritesNumber, gamePanel.getTileSize(), 0, nPlayerStartingWidth, nPlayerStartingHeight);
-        nPlayerStartingX = gamePanel.getTileSize();;
+        nPlayerStartingX = gamePanel.getTileSize();
         nPlayerStartingY = 0;
         this.inputHandler = inputHandler;
-        speed = 4;
+        speed = nPlayerStartingSpeed;
         direction = Direction.DOWN;
         collisionBox = new CollisionBox();
-        collisionBox.shape = Shape.rectangle;
+        collisionBox.shape = Shape.through;
         collisionBox.width = width - 10 * gamePanel.getScale();
         collisionBox.height = height / 2 - 10 * gamePanel.getScale();
     }
@@ -37,67 +41,71 @@ public class Player extends Character {
     public void setDefaultValues()
     {
         setSpatialProperties(nPlayerStartingX, nPlayerStartingY, nPlayerStartingWidth, nPlayerStartingHeight);
-        speed = 4;
+        speed = nPlayerStartingSpeed;
         direction = Direction.DOWN;
     }
 
     @Override
     public void update()
     {
-        frameCounter++;
+        nFrameCounter++;
         int oldx = x, oldy = y;
         if (inputHandler.up)
         {
             direction = Direction.UP;
             y -= speed;
+            updateCollisionBox();
+            checkForCollisions(oldx, oldy, Direction.UP);
         }
         if (inputHandler.down)
         {
             direction = Direction.DOWN;
             y += speed;
+            updateCollisionBox();
+            checkForCollisions(oldx, oldy, Direction.DOWN);
         }
-        updateCollisionBox();
-        if (checkForCollisions()) {y = oldy; }
         if (inputHandler.right)
         {
             direction = Direction.RIGHT;
             x += speed;
+            updateCollisionBox();
+            checkForCollisions(oldx, oldy, Direction.RIGHT);
         }
         if (inputHandler.left)
         {
             direction = Direction.LEFT;
             x -= speed;
+            updateCollisionBox();
+            checkForCollisions(oldx, oldy, Direction.LEFT);
         }
-        updateCollisionBox();
-        if (checkForCollisions()) {x = oldx; }
         updateLocation();
     }
 
     @Override
     public void draw(Graphics2D graphics)
     {
-        if (frameCounter % 4 == 0 && inputHandler.moveKeyPressed()) kAnimationStep++;
-        if (frameCounter > 999) { frameCounter = 0; }
+        if (nFrameCounter % 4 == 0 && inputHandler.moveKeyPressed()) nAnimationStep++;
+        if (nFrameCounter > 999) { nFrameCounter = 0; }
 
-        if (kAnimationStep >= nPlayerSpritesNumber)
+        if (nAnimationStep >= nPlayerSpritesNumber)
         {
-            kAnimationStep = 0;
+            nAnimationStep = 0;
         }
 
         BufferedImage image = null;
         switch (direction)
         {
             case UP:
-                image = sprites.get(Direction.UP)[kAnimationStep];
+                image = sprites.get(Direction.UP)[nAnimationStep];
                 break;
             case DOWN:
-                image = sprites.get(Direction.DOWN)[kAnimationStep];
+                image = sprites.get(Direction.DOWN)[nAnimationStep];
                 break;
             case RIGHT:
-                image = sprites.get(Direction.RIGHT)[kAnimationStep];
+                image = sprites.get(Direction.RIGHT)[nAnimationStep];
                 break;
             case LEFT:
-                image = sprites.get(Direction.RIGHT)[kAnimationStep];
+                image = sprites.get(Direction.RIGHT)[nAnimationStep];
                 break;
         }
         
@@ -108,7 +116,6 @@ public class Player extends Character {
         else { graphics.drawImage(image, x, y, width, height, null); }
         graphics.setColor(Color.red);
         graphics.drawRect(collisionBox.x, collisionBox.y, collisionBox.width, collisionBox.height);
-        //System.out.println("x: " + (int)(location / gamePanel.getMaxScreenRows()) + " y: " + (int)(location % gamePanel.getMaxScreenColumns()));
     }
 
     @Override
@@ -124,19 +131,140 @@ public class Player extends Character {
     }
 
     @Override
-    public boolean intersects(Collider collider) {
+    public Action intersects(Collider collider, Direction from) {
         CollisionBox box = collider.getCollisionBox();
         switch (box.shape)
         {
-            case rectangle:
-                return collisionHandler.rectangularCollision(collisionBox, box);
-            case rounded:
-                return collisionHandler.roundCollision(collisionBox, box);
+            case through:
+                return collisionHandler.rectangularCollision(collisionBox, box, from);
+            case solid:
+                return collisionHandler.roundCollision(collisionBox, box, from);
             default:
-                return false;
+                return Action.none;
         }
     }
 
+    public void checkForCollisions(int oldx, int oldy, Direction towards)
+    {
+        for (int i = -1; i <= 1; i++)
+        {
+            int gridX = location / gamePanel.getMaxScreenRows() + i;
+            if (gridX < 0) continue;
+            else if (gridX >= gamePanel.getMaxScreenRows()) break;
+            for (int j = -1; j <= 1; j++)
+            {
+                int gridY = location % gamePanel.getMaxScreenColumns() + j;
+                if (gridY >= gamePanel.getMaxScreenColumns()) continue;
+                if (gridY < 0) continue;
 
+                int checkLocation = gridY + gridX * gamePanel.getMaxScreenColumns();
 
+                Entity other = stage.getTiles()[checkLocation];
+                CollisionBox otherBox = other.getCollisionBox();
+                Direction from = (towards == Direction.LEFT) ? Direction.RIGHT :
+                                 (towards == Direction.RIGHT) ? Direction.LEFT :
+                                 (towards == Direction.DOWN) ? Direction.UP : Direction.DOWN;
+                Action action = intersects(other, from);
+                switch (action)
+                {
+                    case stop:
+                        if (towards == Direction.LEFT || towards == Direction.RIGHT) 
+                            { x = oldx; }
+                        else y = oldy;
+                        break;
+                    case push:   
+                        Vector2D center = new Vector2D(collisionBox.x + collisionBox.width / 2, collisionBox.y + collisionBox.height / 2);
+                        Vector2D otherCenter = new Vector2D(otherBox.x + otherBox.width / 2, otherBox.y + otherBox.height / 2);
+                        Vector2D difference = otherCenter.minus(center);
+                        Vector2D unitDifference = difference.scale(1 / difference.getLength());
+                        if (difference.getLength() < collisionBox.width + otherBox.width * fSqrt2 / 2)
+                        {
+                            if (!isCorner(gridX, gridY, towards, unitDifference))
+                            {
+                                if (towards == Direction.LEFT || towards == Direction.RIGHT) 
+                                    { x = oldx; }
+                                else y = oldy;
+                            }
+                            else
+                            {
+                                final int pushX = (int)Math.abs(speed * unitDifference.x);
+                                final int pushY = (int)Math.abs(speed * unitDifference.y);
+                                switch (towards)
+                                {
+                                    case LEFT:
+                                        x = oldx - pushX;
+                                        if (difference.getAngleSign() > 0) y += pushY; // I'm going down on the screen
+                                        else y -= pushY;                               // I'm going up on the screen
+                                        break;
+                                    case RIGHT:
+                                        x = oldx + pushX;
+                                        if (difference.getAngleSign() > 0) y -= pushY; // I'm going up on the screen
+                                        else y += pushY;                               // I'm going down on the screen
+                                        break;
+                                    case DOWN:
+                                        y = oldy + pushY;
+                                        if (difference.getAngleSign() > 0) x -= pushX; // I'm going west; must be pushed westward
+                                        else  x += pushX;                              // I'm going east; must be pushed eastward
+                                        break;
+                                    case UP:
+                                        y = oldy - pushY;
+                                        if (difference.getAngleSign() > 0)  x += pushX; // I'm going east; must be pushed eastward
+                                        else  x -= pushX;                               // I'm going west; must be pushed westward
+                                        break;
+                                }
+                            }
+                        }
+                        break;
+                    case none:
+                        // no collision, nothing to do.
+                }
+            }
+        }
+    }
+
+    private boolean isCorner(int blockRow, int blockCol, Direction towards, Vector2D difference)
+    {
+        int ncols = gamePanel.getMaxScreenColumns();
+        Block nextTile;
+        Direction push = null;
+        switch (towards)
+        {
+            case LEFT:
+                push = (difference.getAngle() > 0) ? Direction.DOWN : Direction.UP;
+            case RIGHT:
+                if (towards == Direction.RIGHT) push = (difference.getAngle() > 0) ? Direction.UP : Direction.DOWN;
+                switch (push)
+                {
+                    case UP:
+                        nextTile = stage.getTiles()[blockCol + (blockRow - 1) * ncols];
+                        if (nextTile.collisionBox.shape == Shape.solid) return false;
+                        else return true;
+                    case DOWN:
+                        nextTile = stage.getTiles()[blockCol + (blockRow + 1) * ncols];
+                        if (nextTile.collisionBox.shape == Shape.solid) return false;
+                        else return true;
+                    default:
+                }
+                break;
+            case UP:
+                push = (difference.getAngle() > 0) ? Direction.RIGHT : Direction.LEFT;
+            case DOWN:
+                if (towards == Direction.DOWN) push = (difference.getAngle() > 0) ? Direction.LEFT : Direction.RIGHT;
+                switch (push)
+                {
+                    case LEFT:
+                        nextTile = stage.getTiles()[blockCol - 1 + (blockRow) * ncols];
+                        if (nextTile.collisionBox.shape == Shape.solid) return false;
+                        else return true;
+                    case RIGHT:
+                        nextTile = stage.getTiles()[blockCol + 1 + (blockRow) * ncols];
+                        if (nextTile.collisionBox.shape == Shape.solid) return false;
+                        else return true;
+                    default:
+                }
+                break;
+            default:         
+        }
+        return true;
+    }
 }

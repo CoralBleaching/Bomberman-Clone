@@ -11,19 +11,11 @@ import javax.imageio.ImageIO;
 import main.GamePanel;
 import main.Stage;
 
-enum Direction
-{
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT
-}
-
 abstract public class Character extends Entity {
     protected Map<Direction, BufferedImage[]> sprites;
     protected Direction direction;
     protected int spritesNumber;
-    protected int kAnimationStep, frameCounter;
+    protected int nAnimationStep, nFrameCounter;
     protected Stage stage;
     protected int location;
 
@@ -34,8 +26,8 @@ abstract public class Character extends Entity {
         super(gamePanel, resourcesPath, x, y, width, height);
         this.stage = stage;
         this.spritesNumber = spritesNumber;
-        kAnimationStep = 0;
-        frameCounter = 0;
+        nAnimationStep = 0;
+        nFrameCounter = 0;
 
         sprites = new HashMap<Direction, BufferedImage[]>();
         sprites.put(Direction.UP, new BufferedImage[spritesNumber]);
@@ -51,30 +43,6 @@ abstract public class Character extends Entity {
 
         getCharacterImage();
 
-    }
-
-    public boolean checkForCollisions()
-    {
-        for (int i = -1; i <= 1; i++)
-        {
-            int gridX = location / gamePanel.getMaxScreenRows() + i;
-            if (gridX < 0) continue;
-            else if (gridX >= gamePanel.getMaxScreenRows()) break;
-            for (int j = -1; j <= 1; j++)
-            {
-                int gridY = location % gamePanel.getMaxScreenColumns() + j;
-                if (gridY >= gamePanel.getMaxScreenColumns()) continue;
-                if (gridY < 0) continue;
-
-                int checkLocation = gridY + gridX * gamePanel.getMaxScreenColumns();
-
-                if (intersects(stage.getTiles()[checkLocation]))
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     public void getCharacterImage()

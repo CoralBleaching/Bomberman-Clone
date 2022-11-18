@@ -14,6 +14,7 @@ public class Stage {
     private GamePanel gamePanel;
     private InputHandler inputHandler;
     private Player player;
+    private String map;
     //private BackgroundTile[] backgroundTiles;
     //private BreakableTile[] breakableTiles;
     //private SolidTile[] solidTiles;
@@ -26,7 +27,7 @@ public class Stage {
 
         player = new Player(this, gamePanel, inputHandler);
         //String map = buildMap();
-        String map = testMap();
+        map = testMap();
 
         //backgroundTiles = new BackgroundTile[gamePanel.kMaxScreenRows * gamePanel.kMaxScreenColumns];
         tiles = new Block[gamePanel.getMaxScreenRows() * gamePanel.getMaxScreenColumns()];     
@@ -91,9 +92,9 @@ public class Stage {
         return baseMap;
     }
 
-    public Block[] getTiles() {
-        return tiles;
-    }
+    public String getMap() { return map; }
+
+    public Block[] getTiles() { return tiles; }
 
     private String testMap()
     {
