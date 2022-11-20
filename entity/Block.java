@@ -34,9 +34,9 @@ abstract public class Block extends Entity
     }
 
     @Override
-    public boolean intersects(Collider collider) {
+    public Action intersects(Collider collider, Direction from) {
         // TODO Auto-generated method stub
-        return false;
+        return Action.none;
     }
     
     @Override

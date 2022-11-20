@@ -8,7 +8,7 @@ public class SolidTile extends Block {
 
     public SolidTile(GamePanel gamePanel, int x, int y) {
         super(gamePanel, spritePath, x, y);
-        collisionBox.shape = Shape.rectangle;
+        collisionBox.shape = Shape.solid;
     }
 
     @Override
