@@ -10,6 +10,7 @@ import javax.imageio.ImageIO;
 
 import main.GamePanel;
 import main.Stage;
+import main.collisionHandler.Vector2D;
 
 abstract public class Character extends Entity {
     protected Map<Direction, BufferedImage[]> sprites;
@@ -17,7 +18,6 @@ abstract public class Character extends Entity {
     protected int spritesNumber;
     protected int nAnimationStep, nFrameCounter;
     protected Stage stage;
-    protected int location;
 
     private Map<Direction, String> filePrefixes;
 
@@ -45,6 +45,11 @@ abstract public class Character extends Entity {
 
     }
 
+    @Override
+    public Vector2D getCenter() {
+        return new Vector2D(collisionBox.x + collisionBox.width / 2, collisionBox.y + collisionBox.height / 2);
+    }
+    
     public void getCharacterImage()
     {
         try
@@ -60,13 +65,6 @@ abstract public class Character extends Entity {
             }
         }
         catch (IOException e) { e.printStackTrace(); }
-    }
-
-    public void updateLocation()
-    {
-        int gridY = collisionBox.x / gamePanel.getTileSize();
-        int gridX = collisionBox.y / gamePanel.getTileSize();
-        location = gridY + gridX * gamePanel.getMaxScreenColumns();
     }
 
 }

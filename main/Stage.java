@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import entity.Player;
 import entity.BackgroundTile;
 import entity.Block;
+import entity.Bomb;
 import entity.BreakableTile;
 //import entity.BreakableTile;
 import entity.SolidTile;
@@ -13,11 +14,10 @@ public class Stage {
 
     private GamePanel gamePanel;
     private InputHandler inputHandler;
-    private Player player;
     private String map;
-    //private BackgroundTile[] backgroundTiles;
-    //private BreakableTile[] breakableTiles;
-    //private SolidTile[] solidTiles;
+    private Player player;
+
+    private Bomb[] bombs;
     private Block[] tiles;
 
     public Stage(GamePanel gamePanel_, InputHandler inputHandler_)
@@ -29,14 +29,14 @@ public class Stage {
         //String map = buildMap();
         map = testMap();
 
-        //backgroundTiles = new BackgroundTile[gamePanel.kMaxScreenRows * gamePanel.kMaxScreenColumns];
-        tiles = new Block[gamePanel.getMaxScreenRows() * gamePanel.getMaxScreenColumns()];     
+        int gridLength = gamePanel.getGridLength();
+        tiles = new Block[gridLength];
+        bombs = new Bomb[gridLength];     
         for (int i = 0; i < gamePanel.getMaxScreenRows(); i++)
         {
             for (int j = 0; j < gamePanel.getMaxScreenColumns(); j++)
             {
                 int pos = j + i * gamePanel.getMaxScreenColumns();
-                //backgroundTiles[j + i * gamePanel.kMaxScreenColumns] = new BackgroundTile(gamePanel, i * gamePanel.kTileSize, j * gamePanel.kTileSize);
                 if (map.charAt(pos) == 'w')
                 {
                     tiles[pos] = new SolidTile(gamePanel, j * gamePanel.getTileSize(), i * gamePanel.getTileSize());
@@ -59,14 +59,19 @@ public class Stage {
 
     public void update()
     {
+        for (int i = 0; i < gamePanel.getGridLength(); i++)
+        {
+            if (bombs[i] != null) bombs[i].update();
+        }
         player.update();
     }
 
     public void draw(Graphics2D graphics)
     {
-        for (Block tile : tiles)
+        for (int i = 0; i < gamePanel.getGridLength(); i++)
         {
-            tile.draw(graphics);
+            tiles[i].draw(graphics);
+            if (bombs[i] != null) bombs[i].draw(graphics);
         }
         player.draw(graphics);
     }
@@ -92,8 +97,9 @@ public class Stage {
         return baseMap;
     }
 
+    public Bomb[] getBombs() { return bombs; }
     public String getMap() { return map; }
-
+    public Player getPlayer() { return player; }
     public Block[] getTiles() { return tiles; }
 
     private String testMap()

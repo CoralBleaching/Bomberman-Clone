@@ -97,6 +97,7 @@ public class GamePanel extends JPanel implements Runnable
         g2d.dispose();
     }
 
+    public int getGridLength() { return nMaxScreenColumns * nMaxScreenRows; }
     public int getTileSize() { return nTileSize; }
     public int getMaxScreenColumns() { return nMaxScreenColumns; }
     public int getMaxScreenRows() { return nMaxScreenRows; }
