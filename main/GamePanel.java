@@ -2,6 +2,7 @@ package main;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import javax.swing.JPanel;
@@ -9,6 +10,8 @@ import javax.swing.JPanel;
 
 public class GamePanel extends JPanel implements Runnable
 {
+    public static enum GameState { menu, stage, game_over }
+    private static GameState _gameState; 
     private int nOriginalTileSize = 64; 
     private int nScale = 1;
 
@@ -21,15 +24,26 @@ public class GamePanel extends JPanel implements Runnable
  
     private int nFPS = 60;
     private int nOneSecondMs = 1000; // ms
+    private int drawCount = 0;
+    private long timer = 0;
+    private double delta = 0;
+    private double lastFpsCount = -1;
+
+    private boolean bExit = false;
 
     InputHandler inputHandler;
     Thread gameThread;
     Stage stage;
+    Menu menu;
+    GameOver gameOver;
 
     public GamePanel()
     {
+        _gameState = GameState.menu;
         inputHandler = new InputHandler();    
-        stage = new Stage(this, inputHandler);    
+        stage = new Stage(this, inputHandler);   
+        menu = new Menu(this, inputHandler); 
+        gameOver = new GameOver(this, inputHandler);
         
         setPreferredSize(new Dimension(nScreenWidth, nScreenHeight));
         setBackground(Color.black);
@@ -47,18 +61,16 @@ public class GamePanel extends JPanel implements Runnable
     @Override
     public void run() {
         double drawInterval = nOneSecondMs / nFPS;
-        double delta = 0;
         long lastTime = System.currentTimeMillis();
         long currentTime;
-        // long timer = 0;
-        // int drawCount = 0;
 
-        while (gameThread != null)
+        while (gameThread != null && !bExit)
         {
             currentTime = System.currentTimeMillis();
             delta += (currentTime - lastTime) / drawInterval;
-            // timer += (currentTime - lastTime);
+            timer += (currentTime - lastTime);
             lastTime = currentTime;
+
 
             if (delta >= 1)
             {
@@ -67,23 +79,34 @@ public class GamePanel extends JPanel implements Runnable
                 repaint();
 
                 delta--;
-
-                // drawCount++;
+                drawCount++;
             }
 
-            // if (timer > oneSecondMs)
-            // {
-            //     System.out.println("FPS: " + drawCount);
-            //     drawCount = 0;
-            //     timer = 0;
-            // }
+            if (timer > nOneSecondMs)
+            {
+                lastFpsCount = drawCount;
+                drawCount = 0;
+                timer = 0;
+            }
+
         }
-        
+        return;
     }
 
     public void update()
     {
-        stage.update();
+        switch (_gameState)
+        {
+            case menu:
+                menu.update();
+                break;
+            case stage:
+                stage.update();
+                break;
+            case game_over:
+                gameOver.update();
+                break;
+        }
     }
 
     public void paintComponent(Graphics g)
@@ -92,7 +115,23 @@ public class GamePanel extends JPanel implements Runnable
 
         Graphics2D g2d = (Graphics2D)g;
 
-        stage.draw(g2d);
+        switch (_gameState)
+        {
+            case game_over:
+                gameOver.draw(g2d);
+                break;
+            case menu:
+                menu.draw(g2d);
+                break;
+            case stage:
+                stage.draw(g2d);
+                break;
+        }
+        
+        g2d.setColor(Color.white);
+        g2d.setFont(new Font("sans serif", Font.PLAIN, 10));
+        g2d.drawString("FPS: " + lastFpsCount, 10, 10);
+
 
         g2d.dispose();
     }
@@ -102,4 +141,8 @@ public class GamePanel extends JPanel implements Runnable
     public int getMaxScreenColumns() { return nMaxScreenColumns; }
     public int getMaxScreenRows() { return nMaxScreenRows; }
     public int getScale() { return nScale; }
+    public int getScreenWidth() { return nScreenWidth; }
+    public int getScreenHeight() { return nScreenHeight; }
+    public void setExit(boolean exit) { bExit = exit; }
+    public void setGameState(GameState gameState) { _gameState = gameState; }
 }

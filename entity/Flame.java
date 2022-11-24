@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.awt.Graphics2D;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
@@ -42,11 +43,15 @@ public class Flame extends Entity
 
     public boolean checkForCollisions()
     {   
+        var characters = checkForCharacterCollisions();
+        for (var character : characters) character.explode();
+        
         Bomb bomb = _stage.getBombs()[location];
         Block block = _stage.getTiles()[location];
         if (bomb != null)
         {
-            bomb.setTimer(bomb.getTimerMax());
+            if (bomb.getTimer() < bomb.getChainFuseDelay())
+                bomb.setTimer(bomb.getChainFuseDelay());
             return true;
         }
         else if (block.getCollisionBox().shape == Shape.solid)
@@ -55,6 +60,14 @@ public class Flame extends Entity
             return true;
         }
         else return false;
+    }
+
+    public ArrayList<Character> checkForCharacterCollisions()
+    {
+        var characters = new ArrayList<Character>();
+        if (intersects(_stage.getPlayer(), null) == Action.stop) 
+            characters.add(_stage.getPlayer());
+        return characters;
     }
 
     @Override

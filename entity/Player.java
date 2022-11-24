@@ -4,7 +4,9 @@ import main.GamePanel;
 import main.InputHandler;
 import main.Stage;
 import main.collisionHandler;
+import main.GamePanel.GameState;
 import main.collisionHandler.Vector2D;
+import util.Tint;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -51,6 +53,8 @@ public class Player extends Character {
     public void update()
     {
         nFrameCounter++;
+        if (state != State.idle) return;
+
         int oldx = x, oldy = y;
         if (inputHandler.bomb)
         {
@@ -96,7 +100,14 @@ public class Player extends Character {
     @Override
     public void draw(Graphics2D graphics)
     {
-        if (nFrameCounter % 4 == 0 && inputHandler.moveKeyPressed()) nAnimationStep++;
+        if (state == State.finishedExploding) return;
+
+        if (nFrameCounter % 4 == 0 && 
+            inputHandler.moveKeyPressed() &&
+            state == State.idle) 
+            {
+                nAnimationStep++;
+            }
         if (nFrameCounter > 999) { nFrameCounter = 0; }
 
         if (nAnimationStep >= nPlayerSpritesNumber)
@@ -121,6 +132,18 @@ public class Player extends Character {
                 break;
         }
         
+        if (state == State.exploding)
+        {
+            nTintLevel += nTintStep;
+            if (nTintLevel > 255) nTintLevel = 255;
+            image = Tint.tint(image, new Color(255, 0, 0, nTintLevel));
+            if (nTintLevel == 250) 
+            {
+                state = State.finishedExploding;
+                gamePanel.setGameState(GameState.game_over);
+            }
+        }
+
         if (direction == Direction.LEFT)
         {
             graphics.drawImage(image, x + width, y, -width, height, null);
@@ -304,4 +327,9 @@ public class Player extends Character {
     }
 
     public void setUponBomb(boolean value) { uponBomb = value; }
+
+    @Override
+    public void explode() {
+        setState(State.exploding);
+    }
 }

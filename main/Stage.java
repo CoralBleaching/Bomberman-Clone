@@ -8,7 +8,6 @@ import entity.Block;
 import entity.Bomb;
 import entity.BreakableTile;
 import entity.Flame;
-//import entity.BreakableTile;
 import entity.SolidTile;
 
 public class Stage {
@@ -17,6 +16,9 @@ public class Stage {
     private InputHandler inputHandler;
     private String map;
     private Player player;
+
+    private int nStartFrames;
+    private boolean bRoundStarted;
 
     private Bomb[] bombs;
     private Block[] tiles;
@@ -56,8 +58,8 @@ public class Stage {
             }
         }
 
-        //solidTiles = new SolidTile[24];
-        //breakableTiles = new BreakableTile[24];
+        nStartFrames = 0;
+        bRoundStarted = false;
     }
 
     public void update()
@@ -68,7 +70,8 @@ public class Stage {
             if (BreakableTile.class.isInstance(tiles[i])) tiles[i].update();
             if (flames[i] != null) flames[i].update();
         }
-        player.update();
+        if (bRoundStarted) player.update();
+        else if (++nStartFrames > 30) bRoundStarted = true;
     }
 
     public void draw(Graphics2D graphics)

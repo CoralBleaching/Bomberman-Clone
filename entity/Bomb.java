@@ -18,12 +18,14 @@ import main.Stage;
 public class Bomb extends Entity implements Explodable {
     private static final String sSpritesPath = "resources/bomb/";
     private static final int nSprites = 3;
-    private static final int nTimerMax = 4;
+    private static final float fTimerMax = 4f;
+    private static final float fChainFuseDelay = 0.95f * fTimerMax;
     private static BufferedImage[] sprites;
     private static Stage stage;
     private Player player;
     private int nAnimationStep, nFrameCounter;
-    private int nTimer, nTintLevel, nTintStep;
+    private int nTintLevel, nTintStep;
+    private float fTimer;
     private boolean bShrinking, bFusing;
     private BufferedImage sprite;
     private State state;
@@ -44,7 +46,7 @@ public class Bomb extends Entity implements Explodable {
         getBombSprites();
         nAnimationStep = 0; nFrameCounter = 0; 
         nTintLevel = 0; nTintStep = 80;
-        power = 3;
+        power = 2;
     }
 
     private void getBombSprites()
@@ -100,8 +102,8 @@ public class Bomb extends Entity implements Explodable {
             }
             nFrameCounter++;
             
-            if (nFrameCounter % 60 == 0) nTimer++;
-            if (nTimer >= nTimerMax) 
+            if (nFrameCounter % 6  == 0) fTimer += 0.1;
+            if (fTimer >= fTimerMax) 
             {
                 collisionBox.shape = Shape.through;
                 state = State.exploding;
@@ -160,7 +162,11 @@ public class Bomb extends Entity implements Explodable {
     
     public void explode()
     {
-        stage.getFlames()[location] = new Flame(gamePanel, x, y, width, height, stage);
+        Flame centerFlame = new Flame(gamePanel, x, y, width, height, stage);
+        stage.getFlames()[location] = centerFlame;
+        var characters = centerFlame.checkForCharacterCollisions();
+        for (var character : characters) character.explode();
+
         int ncols = gamePanel.getMaxScreenColumns();
         int tileSize = gamePanel.getTileSize();
         Flame newFlame = null;
@@ -187,7 +193,7 @@ public class Bomb extends Entity implements Explodable {
                     if (newLocation % ncols == 0 || newLocation > gamePanel.getGridLength()) break;
                     newFlame = new Flame(gamePanel, x + tileSize * i, y, width, height, stage);
                 } 
-                else 
+                else//if (direction == Direction.UP)
                 {
                     newLocation = location - ncols * i;
                     if (newLocation < 0) break;
@@ -199,8 +205,10 @@ public class Bomb extends Entity implements Explodable {
         }
     }
 
-    public int getTimerMax() { return nTimerMax; }
-    public void setTimer(int time) { nTimer = time; }
+    public float getChainFuseDelay() { return fChainFuseDelay; }
+    public float getTimer() { return fTimer; }
+    public float getTimerMax() { return fTimerMax; }
+    public void setTimer(float time) { fTimer = time; }
 
     @Override
     public State getState() {
