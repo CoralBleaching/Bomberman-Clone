@@ -295,7 +295,7 @@ public class Player extends Character {
         return true;
     }
 
-    private int getCenterLocation()
+    public int getCenterLocation()
     {
         Vector2D center = getCenter();
         int gridY = (int)Math.floor(center.x / gamePanel.getTileSize());

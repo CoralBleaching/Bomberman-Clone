@@ -9,7 +9,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 public class Tint {
-    private static BufferedImage tint(BufferedImage image, Color color)
+    public static BufferedImage tint(BufferedImage image, Color color)
     {
         int w = image.getWidth();
         int h = image.getHeight();

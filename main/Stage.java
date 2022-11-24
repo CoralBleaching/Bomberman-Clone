@@ -7,6 +7,7 @@ import entity.BackgroundTile;
 import entity.Block;
 import entity.Bomb;
 import entity.BreakableTile;
+import entity.Flame;
 //import entity.BreakableTile;
 import entity.SolidTile;
 
@@ -19,6 +20,7 @@ public class Stage {
 
     private Bomb[] bombs;
     private Block[] tiles;
+    private Flame[] flames;
 
     public Stage(GamePanel gamePanel_, InputHandler inputHandler_)
     {
@@ -32,6 +34,7 @@ public class Stage {
         int gridLength = gamePanel.getGridLength();
         tiles = new Block[gridLength];
         bombs = new Bomb[gridLength];     
+        flames = new Flame[gridLength];
         for (int i = 0; i < gamePanel.getMaxScreenRows(); i++)
         {
             for (int j = 0; j < gamePanel.getMaxScreenColumns(); j++)
@@ -43,7 +46,7 @@ public class Stage {
                 }
                 else if (map.charAt(pos) == 'o')
                 {
-                    tiles[pos] = new BreakableTile(gamePanel, j * gamePanel.getTileSize(), i * gamePanel.getTileSize());
+                    tiles[pos] = new BreakableTile(gamePanel, j * gamePanel.getTileSize(), i * gamePanel.getTileSize(), this);
                 }
                 else
                 {
@@ -62,6 +65,8 @@ public class Stage {
         for (int i = 0; i < gamePanel.getGridLength(); i++)
         {
             if (bombs[i] != null) bombs[i].update();
+            if (BreakableTile.class.isInstance(tiles[i])) tiles[i].update();
+            if (flames[i] != null) flames[i].update();
         }
         player.update();
     }
@@ -71,6 +76,7 @@ public class Stage {
         for (int i = 0; i < gamePanel.getGridLength(); i++)
         {
             tiles[i].draw(graphics);
+            if (flames[i] != null) flames[i].draw(graphics);
             if (bombs[i] != null) bombs[i].draw(graphics);
         }
         player.draw(graphics);
@@ -98,6 +104,7 @@ public class Stage {
     }
 
     public Bomb[] getBombs() { return bombs; }
+    public Flame[] getFlames() { return flames; }
     public String getMap() { return map; }
     public Player getPlayer() { return player; }
     public Block[] getTiles() { return tiles; }
