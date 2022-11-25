@@ -5,20 +5,24 @@ import java.awt.Graphics2D;
 import entity.Player;
 import entity.BackgroundTile;
 import entity.Block;
+import entity.Bomb;
 import entity.BreakableTile;
-//import entity.BreakableTile;
+import entity.Flame;
 import entity.SolidTile;
 
 public class Stage {
 
     private GamePanel gamePanel;
     private InputHandler inputHandler;
-    private Player player;
     private String map;
-    //private BackgroundTile[] backgroundTiles;
-    //private BreakableTile[] breakableTiles;
-    //private SolidTile[] solidTiles;
+    private Player player;
+
+    private int nStartFrames;
+    private boolean bRoundStarted;
+
+    private Bomb[] bombs;
     private Block[] tiles;
+    private Flame[] flames;
 
     public Stage(GamePanel gamePanel_, InputHandler inputHandler_)
     {
@@ -29,21 +33,22 @@ public class Stage {
         //String map = buildMap();
         map = testMap();
 
-        //backgroundTiles = new BackgroundTile[gamePanel.kMaxScreenRows * gamePanel.kMaxScreenColumns];
-        tiles = new Block[gamePanel.getMaxScreenRows() * gamePanel.getMaxScreenColumns()];     
+        int gridLength = gamePanel.getGridLength();
+        tiles = new Block[gridLength];
+        bombs = new Bomb[gridLength];     
+        flames = new Flame[gridLength];
         for (int i = 0; i < gamePanel.getMaxScreenRows(); i++)
         {
             for (int j = 0; j < gamePanel.getMaxScreenColumns(); j++)
             {
                 int pos = j + i * gamePanel.getMaxScreenColumns();
-                //backgroundTiles[j + i * gamePanel.kMaxScreenColumns] = new BackgroundTile(gamePanel, i * gamePanel.kTileSize, j * gamePanel.kTileSize);
                 if (map.charAt(pos) == 'w')
                 {
                     tiles[pos] = new SolidTile(gamePanel, j * gamePanel.getTileSize(), i * gamePanel.getTileSize());
                 }
                 else if (map.charAt(pos) == 'o')
                 {
-                    tiles[pos] = new BreakableTile(gamePanel, j * gamePanel.getTileSize(), i * gamePanel.getTileSize());
+                    tiles[pos] = new BreakableTile(gamePanel, j * gamePanel.getTileSize(), i * gamePanel.getTileSize(), this);
                 }
                 else
                 {
@@ -53,20 +58,29 @@ public class Stage {
             }
         }
 
-        //solidTiles = new SolidTile[24];
-        //breakableTiles = new BreakableTile[24];
+        nStartFrames = 0;
+        bRoundStarted = false;
     }
 
     public void update()
     {
-        player.update();
+        for (int i = 0; i < gamePanel.getGridLength(); i++)
+        {
+            if (bombs[i] != null) bombs[i].update();
+            if (BreakableTile.class.isInstance(tiles[i])) tiles[i].update();
+            if (flames[i] != null) flames[i].update();
+        }
+        if (bRoundStarted) player.update();
+        else if (++nStartFrames > 30) bRoundStarted = true;
     }
 
     public void draw(Graphics2D graphics)
     {
-        for (Block tile : tiles)
+        for (int i = 0; i < gamePanel.getGridLength(); i++)
         {
-            tile.draw(graphics);
+            tiles[i].draw(graphics);
+            if (flames[i] != null) flames[i].draw(graphics);
+            if (bombs[i] != null) bombs[i].draw(graphics);
         }
         player.draw(graphics);
     }
@@ -92,8 +106,10 @@ public class Stage {
         return baseMap;
     }
 
+    public Bomb[] getBombs() { return bombs; }
+    public Flame[] getFlames() { return flames; }
     public String getMap() { return map; }
-
+    public Player getPlayer() { return player; }
     public Block[] getTiles() { return tiles; }
 
     private String testMap()

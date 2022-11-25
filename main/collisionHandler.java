@@ -141,4 +141,12 @@ public class collisionHandler {
         public Vector2D minus(Vector2D other) { return new Vector2D(x - other.x, y - other.y); }
         public Vector2D scale(double a) { return new Vector2D(a * x, a * y); }
     }
+
+
+    public static Direction invertDirection(Direction direction)
+    {
+        return (direction == Direction.LEFT) ? Direction.RIGHT :
+            (direction == Direction.RIGHT) ? Direction.LEFT :
+            (direction == Direction.DOWN) ? Direction.UP : Direction.DOWN;
+    }
 }

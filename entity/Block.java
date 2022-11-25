@@ -8,17 +8,15 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import main.GamePanel;
+import main.collisionHandler.Vector2D;
 
 abstract public class Block extends Entity 
 {
     protected BufferedImage sprite;
-    protected CollisionBox collisionBox;
 
     public Block(GamePanel gamePanel, String resourcesPath, int x, int y) 
     {
         super(gamePanel, resourcesPath, x, y, gamePanel.getTileSize(), gamePanel.getTileSize());
-        collisionBox = new CollisionBox();
-        updateCollisionBox();
         try { sprite = ImageIO.read(new File(resourcesPath)); }
         catch (IOException e) { e.printStackTrace(); }
     }
@@ -46,5 +44,11 @@ abstract public class Block extends Entity
         collisionBox.y = y;
         collisionBox.width = width;
         collisionBox.height = height;
+    }
+
+    @Override
+    public Vector2D getCenter()
+    {
+        return new Vector2D(collisionBox.x + collisionBox.width / 2, collisionBox.y + collisionBox.height / 2);
     }
 }

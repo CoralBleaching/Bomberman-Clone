@@ -10,14 +10,16 @@ import javax.imageio.ImageIO;
 
 import main.GamePanel;
 import main.Stage;
+import main.collisionHandler.Vector2D;
 
-abstract public class Character extends Entity {
+abstract public class Character extends Entity implements Explodable {
     protected Map<Direction, BufferedImage[]> sprites;
     protected Direction direction;
     protected int spritesNumber;
     protected int nAnimationStep, nFrameCounter;
+    protected int nTintLevel, nTintStep;
     protected Stage stage;
-    protected int location;
+    protected State state;
 
     private Map<Direction, String> filePrefixes;
 
@@ -26,8 +28,11 @@ abstract public class Character extends Entity {
         super(gamePanel, resourcesPath, x, y, width, height);
         this.stage = stage;
         this.spritesNumber = spritesNumber;
-        nAnimationStep = 0;
+        nAnimationStep = 0; 
         nFrameCounter = 0;
+        nTintLevel = 0;
+        nTintStep = 5;
+        state = State.idle;
 
         sprites = new HashMap<Direction, BufferedImage[]>();
         sprites.put(Direction.UP, new BufferedImage[spritesNumber]);
@@ -45,6 +50,11 @@ abstract public class Character extends Entity {
 
     }
 
+    @Override
+    public Vector2D getCenter() {
+        return new Vector2D(collisionBox.x + collisionBox.width / 2, collisionBox.y + collisionBox.height / 2);
+    }
+    
     public void getCharacterImage()
     {
         try
@@ -62,11 +72,10 @@ abstract public class Character extends Entity {
         catch (IOException e) { e.printStackTrace(); }
     }
 
-    public void updateLocation()
-    {
-        int gridY = collisionBox.x / gamePanel.getTileSize();
-        int gridX = collisionBox.y / gamePanel.getTileSize();
-        location = gridY + gridX * gamePanel.getMaxScreenColumns();
-    }
+    @Override
+    public State getState() { return state; }
+
+    @Override
+    public void setState(State state) { this.state = state; }
 
 }
