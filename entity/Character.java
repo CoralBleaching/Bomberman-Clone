@@ -10,7 +10,7 @@ import javax.imageio.ImageIO;
 
 import main.GamePanel;
 import main.Stage;
-import main.collisionHandler.Vector2D;
+import util.CollisionHandler.Vector2D;
 
 abstract public class Character extends Entity implements Explodable {
     protected Map<Direction, BufferedImage[]> sprites;

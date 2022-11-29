@@ -24,36 +24,39 @@ public class BreakableTile extends Block implements Explodable {
         state = State.idle;
         nTintLevel = 0;
         nTintStep = 10;
-        nFrameCounter = 0;        
+        nFrameCounter = 0;
     }
 
     @Override
     public void update() {
-        if (++nFrameCounter > 999) nFrameCounter = 0;
-        if (state == State.finishedExploding) 
-        {
+        if (++nFrameCounter > 999)
+            nFrameCounter = 0;
+        if (state == State.finishedExploding) {
             _stage.getTiles()[location] = new BackgroundTile(gamePanel, x, y);
         }
     }
 
     @Override
     public void draw(Graphics2D graphics2d) {
-        if (state == State.idle) super.draw(graphics2d);
-        else if (state == State.exploding)
-        {
-            if (nTintLevel >= 100) state = State.finishedExploding; 
-            else 
-            {
+        if (state == State.idle)
+            super.draw(graphics2d);
+        else if (state == State.exploding) {
+            if (nTintLevel >= 100)
+                state = State.finishedExploding;
+            else {
                 Color color;
-                if (nFrameCounter % 4 == 0) nTintLevel += nTintStep;
-                if (nTintLevel > 90) color = Color.black;
-                else color = new Color(100, 0, 0, nTintLevel);
+                if (nFrameCounter % 4 == 0)
+                    nTintLevel += nTintStep;
+                if (nTintLevel > 90)
+                    color = Color.black;
+                else
+                    color = new Color(100, 0, 0, nTintLevel);
                 sprite = Tint.tint(sprite, color);
-                graphics2d.drawImage(sprite, 
-                x, y, width, height, null);    
+                graphics2d.drawImage(sprite,
+                        x, y, width, height, null);
             }
-        }
-        else {} // finished exploding. Don't draw. 
+        } else {
+        } // finished exploding. Don't draw.
     }
 
     @Override
@@ -70,5 +73,5 @@ public class BreakableTile extends Block implements Explodable {
     public void explode() {
         setState(State.exploding);
     }
-    
+
 }

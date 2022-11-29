@@ -3,6 +3,8 @@ package main;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import util.InputHandler;
+
 public class GameOver extends Menu {
 
     public GameOver(GamePanel gamePanel, InputHandler inputHandler) {

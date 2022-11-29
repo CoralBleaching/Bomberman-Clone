@@ -1,6 +1,6 @@
 package entity;
 
-import main.collisionHandler.Vector2D;
+import util.CollisionHandler.Vector2D;
 
 enum Shape {
     none,

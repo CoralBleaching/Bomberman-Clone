@@ -10,8 +10,8 @@ import javax.imageio.ImageIO;
 
 import main.GamePanel;
 import main.Stage;
-import main.collisionHandler;
-import main.collisionHandler.Vector2D;
+import util.CollisionHandler;
+import util.CollisionHandler.Vector2D;
 
 public class Flame extends Entity
 {
@@ -93,7 +93,7 @@ public class Flame extends Entity
         Direction[] directions = Direction.values();
         for (var direction : directions)
         {
-            result = collisionHandler.rectangularCollision(collisionBox, collider.getCollisionBox(), direction);
+            result = CollisionHandler.rectangularCollision(collisionBox, collider.getCollisionBox(), direction);
             if (result == Action.stop) return result;
         }
         return result;

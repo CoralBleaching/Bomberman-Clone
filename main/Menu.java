@@ -10,6 +10,7 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
 import main.GamePanel.GameState;
+import util.InputHandler;
 
 
 public class Menu {

@@ -5,23 +5,28 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import util.InputHandler;
 
-public class GamePanel extends JPanel implements Runnable
-{
-    public static enum GameState { menu, stage, game_over }
-    private static GameState _gameState; 
-    private int nOriginalTileSize = 64; 
+public class GamePanel extends JPanel implements Runnable {
+    public static enum GameState {
+        menu, stage, game_over
+    }
+
+    private GameState gameState;
+    private int nOriginalTileSize = 64;
     private int nScale = 1;
 
     private int nTileSize = nOriginalTileSize * nScale;
-    private int nMaxScreenColumns = 15;
-    private int nMaxScreenRows = 15;
+    private int nMaxScreenColumns = 7;
+    private int nMaxScreenRows = 5;
 
     private int nScreenWidth = nTileSize * nMaxScreenColumns;
     private int nScreenHeight = nTileSize * nMaxScreenRows;
- 
+
     private int nFPS = 60;
     private int nOneSecondMs = 1000; // ms
     private int drawCount = 0;
@@ -37,14 +42,16 @@ public class GamePanel extends JPanel implements Runnable
     Menu menu;
     GameOver gameOver;
 
-    public GamePanel()
-    {
-        _gameState = GameState.menu;
-        inputHandler = new InputHandler();    
-        stage = new Stage(this, inputHandler);   
-        menu = new Menu(this, inputHandler); 
+    JFrame window;
+
+    public GamePanel(JFrame window) {
+        gameState = GameState.menu;
+        this.window = window;
+        inputHandler = new InputHandler();
+        stage = new Stage(this, inputHandler);
+        menu = new Menu(this, inputHandler);
         gameOver = new GameOver(this, inputHandler);
-        
+
         setPreferredSize(new Dimension(nScreenWidth, nScreenHeight));
         setBackground(Color.black);
         setDoubleBuffered(true);
@@ -52,8 +59,7 @@ public class GamePanel extends JPanel implements Runnable
         setFocusable(true);
     }
 
-    public void startGameThread()
-    {
+    public void startGameThread() {
         gameThread = new Thread(this);
         gameThread.start();
     }
@@ -64,16 +70,13 @@ public class GamePanel extends JPanel implements Runnable
         long lastTime = System.currentTimeMillis();
         long currentTime;
 
-        while (gameThread != null && !bExit)
-        {
+        while (gameThread != null && !bExit) {
             currentTime = System.currentTimeMillis();
             delta += (currentTime - lastTime) / drawInterval;
             timer += (currentTime - lastTime);
             lastTime = currentTime;
 
-
-            if (delta >= 1)
-            {
+            if (delta >= 1) {
                 update();
 
                 repaint();
@@ -82,21 +85,18 @@ public class GamePanel extends JPanel implements Runnable
                 drawCount++;
             }
 
-            if (timer > nOneSecondMs)
-            {
+            if (timer > nOneSecondMs) {
                 lastFpsCount = drawCount;
                 drawCount = 0;
                 timer = 0;
             }
-
+            window.setTitle("FPS: " + lastFpsCount);
         }
         return;
     }
 
-    public void update()
-    {
-        switch (_gameState)
-        {
+    public void update() {
+        switch (gameState) {
             case menu:
                 menu.update();
                 break;
@@ -109,14 +109,12 @@ public class GamePanel extends JPanel implements Runnable
         }
     }
 
-    public void paintComponent(Graphics g)
-    {
+    public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        Graphics2D g2d = (Graphics2D)g;
+        Graphics2D g2d = (Graphics2D) g;
 
-        switch (_gameState)
-        {
+        switch (gameState) {
             case game_over:
                 gameOver.draw(g2d);
                 break;
@@ -127,22 +125,47 @@ public class GamePanel extends JPanel implements Runnable
                 stage.draw(g2d);
                 break;
         }
-        
-        g2d.setColor(Color.white);
-        g2d.setFont(new Font("sans serif", Font.PLAIN, 10));
-        g2d.drawString("FPS: " + lastFpsCount, 10, 10);
 
+        // g2d.setColor(Color.white);
+        // g2d.setFont(new Font("sans serif", Font.PLAIN, 10));
+        // g2d.drawString("FPS: " + lastFpsCount, 10, 10);
 
         g2d.dispose();
     }
 
-    public int getGridLength() { return nMaxScreenColumns * nMaxScreenRows; }
-    public int getTileSize() { return nTileSize; }
-    public int getMaxScreenColumns() { return nMaxScreenColumns; }
-    public int getMaxScreenRows() { return nMaxScreenRows; }
-    public int getScale() { return nScale; }
-    public int getScreenWidth() { return nScreenWidth; }
-    public int getScreenHeight() { return nScreenHeight; }
-    public void setExit(boolean exit) { bExit = exit; }
-    public void setGameState(GameState gameState) { _gameState = gameState; }
+    public int getGridLength() {
+        return nMaxScreenColumns * nMaxScreenRows;
+    }
+
+    public int getTileSize() {
+        return nTileSize;
+    }
+
+    public int getMaxScreenColumns() {
+        return nMaxScreenColumns;
+    }
+
+    public int getMaxScreenRows() {
+        return nMaxScreenRows;
+    }
+
+    public int getScale() {
+        return nScale;
+    }
+
+    public int getScreenWidth() {
+        return nScreenWidth;
+    }
+
+    public int getScreenHeight() {
+        return nScreenHeight;
+    }
+
+    public void setExit(boolean exit) {
+        bExit = exit;
+    }
+
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
+    }
 }
