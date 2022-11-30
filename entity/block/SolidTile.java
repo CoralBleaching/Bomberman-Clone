@@ -1,5 +1,6 @@
-package entity;
+package entity.block;
 
+import entity.Shape;
 import main.GamePanel;
 
 public class SolidTile extends Block {
@@ -14,7 +15,7 @@ public class SolidTile extends Block {
     @Override
     public void update() {
         // TODO Auto-generated method stub
-        
+
     }
-    
+
 }

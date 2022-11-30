@@ -1,4 +1,4 @@
-package entity;
+package entity.character;
 
 import main.GamePanel;
 import main.Stage;
@@ -10,6 +10,16 @@ import util.CollisionHandler.Vector2D;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+
+import entity.Action;
+import entity.Bomb;
+import entity.Collider;
+import entity.Direction;
+import entity.Entity;
+import entity.Shape;
+import entity.block.Block;
+import entity.block.PowerUp;
+
 import java.awt.Graphics2D;
 
 public class Player extends Character {
@@ -27,6 +37,8 @@ public class Player extends Character {
     private final double fSqrt2 = Math.sqrt(2.);
 
     private boolean uponBomb;
+
+    public final static int nPlayerMaxSpeed = 7;
 
     public Player(Stage stage, GamePanel gamePanel, InputHandler inputHandler) {
         super(stage, gamePanel, sSpritesPath, nPlayerSpritesNumber, gamePanel.getTileSize(), 0, nPlayerStartingWidth,
@@ -90,6 +102,7 @@ public class Player extends Character {
             updateCollisionBox();
             checkForCollisions(oldx, oldy, Direction.LEFT);
         }
+        updateCollisionBox();
         updateLocation();
     }
 
@@ -207,6 +220,10 @@ public class Player extends Character {
                         x = oldx;
                     } else
                         y = oldy;
+                } else if (otherBox.shape == Shape.through &&
+                        PowerUp.class.isInstance(other)) {
+                    PowerUp powerUp = (PowerUp) other;
+                    powerUp.empowerAndVanish(this);
                 }
                 break;
             case push:
@@ -276,7 +293,7 @@ public class Player extends Character {
                         if (nextPos < 0)
                             return false;
                         nextTile = stage.getTiles()[nextPos];
-                        if (nextTile.collisionBox.shape == Shape.solid)
+                        if (nextTile.getCollisionBox().shape == Shape.solid)
                             return false;
                         if (stage.getBombs()[nextPos] != null)
                             return false;
@@ -287,7 +304,7 @@ public class Player extends Character {
                         if (nextPos >= gamePanel.getGridLength())
                             return false;
                         nextTile = stage.getTiles()[nextPos];
-                        if (nextTile.collisionBox.shape == Shape.solid)
+                        if (nextTile.getCollisionBox().shape == Shape.solid)
                             return false;
                         if (stage.getBombs()[nextPos] != null)
                             return false;
@@ -307,7 +324,7 @@ public class Player extends Character {
                         if (nextPos % ncols == ncols || nextPos < 0)
                             return false;
                         nextTile = stage.getTiles()[nextPos];
-                        if (nextTile.collisionBox.shape == Shape.solid)
+                        if (nextTile.getCollisionBox().shape == Shape.solid)
                             return false;
                         if (stage.getBombs()[nextPos] != null)
                             return false;
@@ -318,7 +335,7 @@ public class Player extends Character {
                         if (nextPos % ncols == 0 || nextPos > gamePanel.getGridLength())
                             return false;
                         nextTile = stage.getTiles()[nextPos];
-                        if (nextTile.collisionBox.shape == Shape.solid)
+                        if (nextTile.getCollisionBox().shape == Shape.solid)
                             return false;
                         if (stage.getBombs()[nextPos] != null)
                             return false;
@@ -347,4 +364,5 @@ public class Player extends Character {
     public void explode() {
         setState(State.exploding);
     }
+
 }

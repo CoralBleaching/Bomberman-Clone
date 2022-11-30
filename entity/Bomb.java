@@ -6,6 +6,8 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import entity.character.Player;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 

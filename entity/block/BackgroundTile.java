@@ -1,9 +1,9 @@
-package entity;
+package entity.block;
 
+import entity.Shape;
 import main.GamePanel;
 
-public class BackgroundTile extends Block 
-{
+public class BackgroundTile extends Block {
     private final static String spritePath = "resources/blocks/BackgroundTile.png";
 
     public BackgroundTile(GamePanel gamePanel, int x, int y) {

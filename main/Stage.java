@@ -2,13 +2,15 @@ package main;
 
 import java.awt.Graphics2D;
 
-import entity.Player;
-import entity.BackgroundTile;
-import entity.Block;
 import entity.Bomb;
-import entity.BreakableTile;
 import entity.Flame;
-import entity.SolidTile;
+import entity.block.BackgroundTile;
+import entity.block.Block;
+import entity.block.BreakableTile;
+import entity.block.PowerUp;
+import entity.block.SolidTile;
+import entity.block.PowerUp.Type;
+import entity.character.Player;
 import util.InputHandler;
 import util.MapElement;
 import util.MapGenerator;
@@ -36,11 +38,16 @@ public class Stage {
         height = gamePanel.getMaxScreenRows();
         tileSize = gamePanel.getTileSize();
 
+        ///////////////////////////////////////
         frequency = 0.8;
         var cutoff = 0.4;
+        var nPowerUps = 4;
         seed = (long) System.nanoTime();
-        mapGenerator = new MapGenerator(gamePanel, frequency, cutoff, seed);
+        ///////////////////////////////////////
+
+        mapGenerator = new MapGenerator(gamePanel, frequency, cutoff, seed, nPowerUps);
         map = mapGenerator.generateNoisyMap();
+        mapGenerator.populateMap(map);
 
         player = new Player(this, gamePanel, inputHandler);
 
@@ -60,12 +67,16 @@ public class Stage {
                                 j * tileSize,
                                 this);
                         break;
+                    case powerup:
+                        tiles[pos] = new BreakableTile(gamePanel, i * tileSize,
+                                j * tileSize,
+                                this);
+                        ((BreakableTile) tiles[pos]).setPowerUp(Type.skates);
+                        break;
                     case groundTile:
                         tiles[pos] = new BackgroundTile(gamePanel, i * tileSize,
                                 j * tileSize);
                     case enemy:
-                        break;
-                    case powerup:
                         break;
                 }
             }

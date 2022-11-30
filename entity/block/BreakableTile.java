@@ -1,8 +1,11 @@
-package entity;
+package entity.block;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
 
+import entity.Explodable;
+import entity.Shape;
+import entity.block.PowerUp.Type;
 import main.GamePanel;
 import main.Stage;
 import util.Tint;
@@ -15,6 +18,7 @@ public class BreakableTile extends Block implements Explodable {
     private int nTintLevel;
     private int nFrameCounter;
     private int nTintStep;
+    private Type powerUpType;
 
     public BreakableTile(GamePanel gamePanel, int x, int y, Stage stage) {
         super(gamePanel, spritePath, x, y);
@@ -25,6 +29,8 @@ public class BreakableTile extends Block implements Explodable {
         nTintLevel = 0;
         nTintStep = 10;
         nFrameCounter = 0;
+
+        powerUpType = null;
     }
 
     @Override
@@ -32,7 +38,10 @@ public class BreakableTile extends Block implements Explodable {
         if (++nFrameCounter > 999)
             nFrameCounter = 0;
         if (state == State.finishedExploding) {
-            _stage.getTiles()[location] = new BackgroundTile(gamePanel, x, y);
+            if (powerUpType == null)
+                _stage.getTiles()[location] = new BackgroundTile(gamePanel, x, y);
+            else
+                _stage.getTiles()[location] = new PowerUp(powerUpType, gamePanel, _stage, x, y);
         }
     }
 
@@ -74,4 +83,11 @@ public class BreakableTile extends Block implements Explodable {
         setState(State.exploding);
     }
 
+    public Type getPowerUp() {
+        return powerUpType;
+    }
+
+    public void setPowerUp(Type powerUp) {
+        this.powerUpType = powerUp;
+    }
 }

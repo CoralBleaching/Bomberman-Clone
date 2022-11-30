@@ -1,46 +1,55 @@
 package util;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
+import entity.block.PowerUp;
 import main.GamePanel;
 
 public class MapGenerator {
     private double frequency;
     private double xOffset, yOffset;
-    private int width, height;
     private GamePanel gamePanel;
 
     long seed;
     double vald;
     double cutoff;
+    int nPowerUps;
     MapElement val;
+    ArrayList<Integer> breakableTilePos;
 
-    public MapGenerator(GamePanel gamePanel, double frequency, double cutoff, long seed) {
+    public MapGenerator(GamePanel gamePanel, double frequency, double cutoff, long seed, int nPowerUps) {
         this.frequency = frequency;
         this.cutoff = cutoff;
+        this.nPowerUps = nPowerUps;
         this.gamePanel = gamePanel;
         xOffset = 0;
         yOffset = 0;
-        width = gamePanel.getMaxScreenColumns();
-        height = gamePanel.getMaxScreenRows();
         this.seed = seed;
+        breakableTilePos = new ArrayList<Integer>();
     }
 
     public MapElement[] generateNoisyMap() {
+        int width = gamePanel.getMaxScreenColumns();
+        int height = gamePanel.getMaxScreenRows();
         MapElement[] map = new MapElement[width * height];
         for (int j = 0; j < height; j++) {
             xOffset = 0;
             for (int i = 0; i < width; i++) {
-                if (i == 0 ||
-                        i == gamePanel.getMaxScreenColumns() - 1 ||
-                        j == 0 ||
-                        j == gamePanel.getMaxScreenRows() - 1 ||
-                        (i % 2 == 0 && j % 2 == 0))
-                    map[i + j * width] = MapElement.solidTile;
-                else if ((i == 1 && (j == 1 || j == 2)) || (i == 2 && j == 2))
-                    map[i + j * width] = MapElement.groundTile;
+                int pos = i + j * width;
+                if (i == 0 || i == width - 1 || j == 0 || j == height - 1 || (i % 2 == 0 && j % 2 == 0))
+                    map[pos] = MapElement.solidTile;
+                else if ((i == 1 && (j == 1 || j == 2)) || (i == 2 && j == 1))
+                    map[pos] = MapElement.groundTile;
                 else {
                     vald = OpenSimplex2S.noise2(seed, xOffset, yOffset);
                     vald = (vald + 1) / 2;
-                    map[i + j * width] = (vald < cutoff) ? MapElement.breakableTile : MapElement.groundTile;
+                    if (vald < cutoff) {
+                        map[pos] = MapElement.breakableTile;
+                        breakableTilePos.add(pos);
+                    } else {
+                        map[pos] = MapElement.groundTile;
+                    }
                 }
                 xOffset += frequency;
             }
@@ -49,8 +58,11 @@ public class MapGenerator {
         return map;
     }
 
-    public void populateMap() {
-
+    public void populateMap(MapElement[] map) {
+        Collections.shuffle(breakableTilePos);
+        breakableTilePos
+                .subList(0, nPowerUps)
+                .forEach(i -> map[i] = MapElement.powerup);
     }
 
     public void setFrequency(double frequency) {

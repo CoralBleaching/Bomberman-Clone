@@ -8,13 +8,15 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
+import entity.block.Block;
+import entity.block.BreakableTile;
+import entity.character.Character;
 import main.GamePanel;
 import main.Stage;
 import util.CollisionHandler;
 import util.CollisionHandler.Vector2D;
 
-public class Flame extends Entity
-{
+public class Flame extends Entity {
     private static final String sSpritesPath = "resources/flame/";
     private final int nSprites = 5;
     private static Stage _stage;
@@ -25,55 +27,51 @@ public class Flame extends Entity
         super(gamePanel_, sSpritesPath, x, y, width, height);
         _stage = stage;
         getFlameSprites();
-        nAnimationStep = 0; nFrameCounter = 0;
+        nAnimationStep = 0;
+        nFrameCounter = 0;
     }
 
-    private void getFlameSprites()
-    {
+    private void getFlameSprites() {
         sprites = new BufferedImage[nSprites];
-        for (int i = 0; i < nSprites; i++)
-        {
-            try 
-            {
-                sprites[i] =  ImageIO.read(new File(resourcesPath + "Flame_" + i + ".png"));
+        for (int i = 0; i < nSprites; i++) {
+            try {
+                sprites[i] = ImageIO.read(new File(resourcesPath + "Flame_" + i + ".png"));
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            catch (IOException e) { e.printStackTrace(); }
         }
     }
 
-    public boolean checkForCollisions()
-    {   
+    public boolean checkForCollisions() {
         var characters = checkForCharacterCollisions();
-        for (var character : characters) character.explode();
-        
+        for (var character : characters)
+            character.explode();
+
         Bomb bomb = _stage.getBombs()[location];
         Block block = _stage.getTiles()[location];
-        if (bomb != null)
-        {
+        if (bomb != null) {
             if (bomb.getTimer() < bomb.getChainFuseDelay())
                 bomb.setTimer(bomb.getChainFuseDelay());
             return true;
-        }
-        else if (block.getCollisionBox().shape == Shape.solid)
-        {
-            if (BreakableTile.class.isInstance(block)) ((BreakableTile) block).explode(); 
+        } else if (block.getCollisionBox().shape == Shape.solid) {
+            if (BreakableTile.class.isInstance(block))
+                ((BreakableTile) block).explode();
             return true;
-        }
-        else return false;
+        } else
+            return false;
     }
 
-    public ArrayList<Character> checkForCharacterCollisions()
-    {
+    public ArrayList<Character> checkForCharacterCollisions() {
         var characters = new ArrayList<Character>();
-        if (intersects(_stage.getPlayer(), null) == Action.stop) 
+        if (intersects(_stage.getPlayer(), null) == Action.stop)
             characters.add(_stage.getPlayer());
         return characters;
     }
 
     @Override
     public Vector2D getCenter() {
-        return new Vector2D(collisionBox.x + collisionBox.width / 2, 
-                            collisionBox.y + collisionBox.height / 2);
+        return new Vector2D(collisionBox.x + collisionBox.width / 2,
+                collisionBox.y + collisionBox.height / 2);
     }
 
     @Override
@@ -83,37 +81,41 @@ public class Flame extends Entity
 
     @Override
     public void updateCollisionBox() {
-        collisionBox.x = x; collisionBox.y = y; 
-        collisionBox.width = width; collisionBox.height = height;
+        collisionBox.x = x;
+        collisionBox.y = y;
+        collisionBox.width = width;
+        collisionBox.height = height;
     }
 
     @Override
     public Action intersects(Collider collider, Direction from) {
         Action result = Action.none;
         Direction[] directions = Direction.values();
-        for (var direction : directions)
-        {
+        for (var direction : directions) {
             result = CollisionHandler.rectangularCollision(collisionBox, collider.getCollisionBox(), direction);
-            if (result == Action.stop) return result;
+            if (result == Action.stop)
+                return result;
         }
         return result;
     }
 
     @Override
     public void update() {
-        if (++nFrameCounter > 999) nFrameCounter = 0;
-        if (nFrameCounter > 60)
-        {
+        if (++nFrameCounter > 999)
+            nFrameCounter = 0;
+        if (nFrameCounter > 60) {
             _stage.getFlames()[location] = null;
         }
     }
 
     @Override
     public void draw(Graphics2D graphics2d) {
-        if (nFrameCounter % 4 == 0) nAnimationStep++;
-        if (nAnimationStep >= nSprites) nAnimationStep = 0;
-        graphics2d.drawImage(sprites[nAnimationStep], 
-        x, y, width, height, null);  
+        if (nFrameCounter % 4 == 0)
+            nAnimationStep++;
+        if (nAnimationStep >= nSprites)
+            nAnimationStep = 0;
+        graphics2d.drawImage(sprites[nAnimationStep],
+                x, y, width, height, null);
     }
 
 }

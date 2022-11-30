@@ -7,6 +7,7 @@ import main.GamePanel;
 abstract public class Entity implements Collider {
     protected int x, y, width, height, location;
     protected int speed;
+
     protected String resourcesPath;
     protected GamePanel gamePanel;
     protected CollisionBox collisionBox;
@@ -53,4 +54,11 @@ abstract public class Entity implements Collider {
         location = column + row * gamePanel.getMaxScreenColumns();
     }
 
+    public int getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
 }
