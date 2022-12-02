@@ -1,21 +1,19 @@
 package entity;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
-
-import entity.character.Player;
-
 import java.awt.Color;
 import java.awt.Graphics2D;
-
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 import util.Tint;
 import util.CollisionHandler;
 import util.CollisionHandler.Vector2D;
+
+import entity.character.Player;
 import main.GamePanel;
 import main.Stage;
+import main.Sound.Sounditem;
 
 public class Bomb extends Entity implements Explodable {
     private static final String sSpritesPath = "resources/bomb/";
@@ -33,13 +31,13 @@ public class Bomb extends Entity implements Explodable {
     private State state;
     private int power;
 
-    public Bomb(GamePanel gamePanel, int location, Stage stage_) {
+    public Bomb(GamePanel gamePanel, int location, Stage stage, int power) {
         super(gamePanel, sSpritesPath, -1, -1, gamePanel.getTileSize(), gamePanel.getTileSize());
         this.location = location;
         x = getLocationX();
         y = getLocationY();
         updateCollisionBox();
-        stage = stage_;
+        Bomb.stage = stage;
         player = stage.getPlayer();
         collisionBox.shape = Shape.through;
         bShrinking = true;
@@ -50,8 +48,8 @@ public class Bomb extends Entity implements Explodable {
         nAnimationStep = 0;
         nFrameCounter = 0;
         nTintLevel = 0;
-        nTintStep = 80;
-        power = 2;
+        nTintStep = 15;
+        this.power = power;
     }
 
     private void getBombSprites() {
@@ -110,7 +108,6 @@ public class Bomb extends Entity implements Explodable {
             if (fTimer >= fTimerMax) {
                 collisionBox.shape = Shape.through;
                 state = State.exploding;
-                explode();
             }
         } else if (state == State.exploding) {
             nFrameCounter++;
@@ -120,6 +117,7 @@ public class Bomb extends Entity implements Explodable {
                 player.setUponBomb(false);
             }
         } else {
+            explode();
             stage.getBombs()[location] = null;
         }
 
@@ -154,13 +152,12 @@ public class Bomb extends Entity implements Explodable {
             graphics2d.drawImage(sprites[nAnimationStep],
                     x, y, width, height, null);
         } else if (state == State.exploding) {
-            if (nTintLevel >= 255)
+            if (nTintLevel >= 225)
                 state = State.finishedExploding;
             else {
                 Color color;
-                if (nFrameCounter % 4 == 0)
-                    nTintLevel += nTintStep;
-                if (nTintLevel > 255)
+                nTintLevel += nTintStep;
+                if (nTintLevel > 200)
                     color = Color.white;
                 else
                     color = new Color(255, 0, 0, nTintLevel);
@@ -173,6 +170,9 @@ public class Bomb extends Entity implements Explodable {
     }
 
     public void explode() {
+        player.setnBombs(player.getnBombs() - 1);
+        gamePanel.playSE(Sounditem.explosion);
+
         Flame centerFlame = new Flame(gamePanel, x, y, width, height, stage);
         stage.getFlames()[location] = centerFlame;
         var characters = centerFlame.checkForCharacterCollisions();

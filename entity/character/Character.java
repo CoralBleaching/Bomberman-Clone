@@ -24,7 +24,7 @@ abstract public class Character extends Entity implements Explodable {
     protected Stage stage;
     protected State state;
 
-    private Map<Direction, String> filePrefixes;
+    private static Map<Direction, String> filePrefixes;
 
     public Character(Stage stage, GamePanel gamePanel, String resourcesPath, int spritesNumber, int x, int y, int width,
             int height) {
@@ -43,11 +43,13 @@ abstract public class Character extends Entity implements Explodable {
         sprites.put(Direction.LEFT, new BufferedImage[spritesNumber]);
         sprites.put(Direction.RIGHT, new BufferedImage[spritesNumber]);
 
-        filePrefixes = new HashMap<Direction, String>();
-        filePrefixes.put(Direction.UP, "up_");
-        filePrefixes.put(Direction.DOWN, "down_");
-        filePrefixes.put(Direction.RIGHT, "right_");
-        filePrefixes.put(Direction.LEFT, "left_");
+        if (filePrefixes == null) {
+            filePrefixes = new HashMap<Direction, String>();
+            filePrefixes.put(Direction.UP, "up_");
+            filePrefixes.put(Direction.DOWN, "down_");
+            filePrefixes.put(Direction.RIGHT, "right_");
+            filePrefixes.put(Direction.LEFT, "left_");
+        }
 
         getCharacterImage();
 

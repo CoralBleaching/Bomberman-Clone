@@ -13,10 +13,13 @@ import entity.Shape;
 import entity.character.Player;
 import main.GamePanel;
 import main.Stage;
+import main.Sound.Sounditem;
 
 public class PowerUp extends Block {
     public static enum Type {
-        skates("skates");
+        skates("skates"),
+        bomb("bomb"),
+        fire("fire");
 
         public final String label;
 
@@ -55,6 +58,7 @@ public class PowerUp extends Block {
     }
 
     public void empowerAndVanish(Player player) {
+        gamePanel.playSE(Sounditem.collect);
         switch (type) {
             case skates:
                 var speed = player.getSpeed();
@@ -62,7 +66,17 @@ public class PowerUp extends Block {
                     player.setSpeed(speed + 1);
                 }
                 break;
+            case bomb:
+                player.setMaxBombs(player.getMaxBombs() + 1);
+                break;
+            case fire:
+                player.setFlamePower(player.getFlamePower() + 1);
+                break;
         }
+        vanish();
+    }
+
+    public void vanish() {
         stage.getTiles()[location] = new BackgroundTile(gamePanel, x, y);
     }
 

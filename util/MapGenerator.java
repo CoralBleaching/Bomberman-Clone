@@ -3,7 +3,7 @@ package util;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import entity.block.PowerUp;
+import entity.block.PowerUp.Type;
 import main.GamePanel;
 
 public class MapGenerator {
@@ -63,6 +63,14 @@ public class MapGenerator {
         breakableTilePos
                 .subList(0, nPowerUps)
                 .forEach(i -> map[i] = MapElement.powerup);
+    }
+
+    public Type rafflePowerUp() {
+        var val = Type.values();
+        var len = val.length;
+        var i = gamePanel.rng.nextInt(0, len);
+        System.out.println(val[i]);
+        return val[i];
     }
 
     public void setFrequency(double frequency) {

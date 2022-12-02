@@ -23,19 +23,20 @@ import entity.block.PowerUp;
 import java.awt.Graphics2D;
 
 public class Player extends Character {
+    private final double fSqrt2 = Math.sqrt(2.);
+
     private InputHandler inputHandler;
 
+    private final static int nPlayerStartingNBombs = 9;
+    private final static int nPlayerSartingFlamePower = 2;
     private final static int nPlayerStartingSpeed = 3;
     private final static int nPlayerSpritesNumber = 8;
     private final static String sSpritesPath = "resources/player/";
 
-    private static int nPlayerStartingX = 64;
-    private static int nPlayerStartingY = 64;
     private static int nPlayerStartingWidth = 68;
     private static int nPlayerStartingHeight = 128;
 
-    private final double fSqrt2 = Math.sqrt(2.);
-
+    private int flamePower, nBombs, maxBombs;
     private boolean uponBomb;
 
     public final static int nPlayerMaxSpeed = 7;
@@ -43,11 +44,8 @@ public class Player extends Character {
     public Player(Stage stage, GamePanel gamePanel, InputHandler inputHandler) {
         super(stage, gamePanel, sSpritesPath, nPlayerSpritesNumber, gamePanel.getTileSize(), 0, nPlayerStartingWidth,
                 nPlayerStartingHeight);
-        nPlayerStartingX = gamePanel.getTileSize();
-        nPlayerStartingY = 0;
         this.inputHandler = inputHandler;
-        speed = nPlayerStartingSpeed * gamePanel.getScale();
-        direction = Direction.DOWN;
+        setDefaultValues();
         uponBomb = false;
         collisionBox.shape = Shape.through;
         collisionBox.width = width - 10 * gamePanel.getScale();
@@ -55,11 +53,14 @@ public class Player extends Character {
     }
 
     public void setDefaultValues() {
-        setSpatialProperties(nPlayerStartingX * gamePanel.getScale(),
-                nPlayerStartingY * gamePanel.getScale(),
+        setSpatialProperties(gamePanel.getTileSize(),
+                0,
                 nPlayerStartingWidth * gamePanel.getScale(),
                 nPlayerStartingHeight * gamePanel.getScale());
         speed = nPlayerStartingSpeed * gamePanel.getScale();
+        flamePower = nPlayerSartingFlamePower;
+        nBombs = 0;
+        maxBombs = nPlayerStartingNBombs;
         direction = Direction.DOWN;
     }
 
@@ -73,9 +74,11 @@ public class Player extends Character {
         if (inputHandler.bomb) {
             int centerLocation = getCenterLocation();
             if (stage.getBombs()[centerLocation] == null &&
-                    !uponBomb) {
-                stage.getBombs()[centerLocation] = new Bomb(gamePanel, centerLocation, stage);
+                    !uponBomb &&
+                    nBombs < maxBombs) {
+                stage.getBombs()[centerLocation] = new Bomb(gamePanel, centerLocation, stage, flamePower);
                 uponBomb = true;
+                nBombs++;
             }
         }
         if (inputHandler.up) {
@@ -220,8 +223,7 @@ public class Player extends Character {
                         x = oldx;
                     } else
                         y = oldy;
-                } else if (otherBox.shape == Shape.through &&
-                        PowerUp.class.isInstance(other)) {
+                } else if (PowerUp.class.isInstance(other)) {
                     PowerUp powerUp = (PowerUp) other;
                     powerUp.empowerAndVanish(this);
                 }
@@ -349,13 +351,6 @@ public class Player extends Character {
         return true;
     }
 
-    public int getCenterLocation() {
-        Vector2D center = getCenter();
-        int column = (int) (center.x / gamePanel.getTileSize());
-        int row = (int) (center.y / gamePanel.getTileSize());
-        return column + row * gamePanel.getMaxScreenColumns();
-    }
-
     public void setUponBomb(boolean value) {
         uponBomb = value;
     }
@@ -365,4 +360,27 @@ public class Player extends Character {
         setState(State.exploding);
     }
 
+    public int getFlamePower() {
+        return flamePower;
+    }
+
+    public void setFlamePower(int flamePower) {
+        this.flamePower = flamePower;
+    }
+
+    public int getnBombs() {
+        return nBombs;
+    }
+
+    public void setnBombs(int nBombs) {
+        this.nBombs = nBombs;
+    }
+
+    public int getMaxBombs() {
+        return maxBombs;
+    }
+
+    public void setMaxBombs(int maxBombs) {
+        this.maxBombs = maxBombs;
+    }
 }

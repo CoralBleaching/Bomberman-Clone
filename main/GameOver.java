@@ -11,15 +11,14 @@ public class GameOver extends Menu {
         super(gamePanel, inputHandler);
         setMaxButtonIndex(1);
     }
-    
+
     @Override
-    protected void buildMenuButtons()
-    {
-        int scrWidth = _gamePanel.getScreenWidth();
-        int scrHeight = _gamePanel.getScreenHeight();
+    protected void buildMenuButtons() {
+        int scrWidth = gamePanel.getScreenWidth();
+        int scrHeight = gamePanel.getScreenHeight();
         buttons = new ArrayList<MenuButton>(nMaxButtonIndex);
-        buttons.add(new MenuButton((int)(.30 * scrWidth),(int)(.3 * scrHeight),(int)(0.36 * scrWidth),
-                                   (int)(.15 * scrHeight), "Game Over", true, Color.blue, 
-                                   Color.white, ButtonType.exit));
+        buttons.add(new MenuButton((int) (.30 * scrWidth), (int) (.3 * scrHeight), (int) (0.36 * scrWidth),
+                (int) (.15 * scrHeight), "Game Over", true, Color.blue,
+                Color.white, ButtonType.exit));
     }
 }

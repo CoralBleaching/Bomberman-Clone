@@ -10,6 +10,7 @@ import javax.imageio.ImageIO;
 
 import entity.block.Block;
 import entity.block.BreakableTile;
+import entity.block.PowerUp;
 import entity.character.Character;
 import main.GamePanel;
 import main.Stage;
@@ -50,15 +51,18 @@ public class Flame extends Entity {
         Bomb bomb = _stage.getBombs()[location];
         Block block = _stage.getTiles()[location];
         if (bomb != null) {
-            if (bomb.getTimer() < bomb.getChainFuseDelay())
-                bomb.setTimer(bomb.getChainFuseDelay());
+            // if (bomb.getTimer() < bomb.getChainFuseDelay())
+            // bomb.setTimer(bomb.getChainFuseDelay());
+            bomb.setTimer(bomb.getTimerMax());
             return true;
         } else if (block.getCollisionBox().shape == Shape.solid) {
             if (BreakableTile.class.isInstance(block))
                 ((BreakableTile) block).explode();
             return true;
-        } else
-            return false;
+        } else if (PowerUp.class.isInstance(block)) {
+            ((PowerUp) block).vanish();
+        }
+        return false;
     }
 
     public ArrayList<Character> checkForCharacterCollisions() {
@@ -103,7 +107,7 @@ public class Flame extends Entity {
     public void update() {
         if (++nFrameCounter > 999)
             nFrameCounter = 0;
-        if (nFrameCounter > 60) {
+        if (nFrameCounter > 40) {
             _stage.getFlames()[location] = null;
         }
     }

@@ -7,10 +7,9 @@ import entity.Flame;
 import entity.block.BackgroundTile;
 import entity.block.Block;
 import entity.block.BreakableTile;
-import entity.block.PowerUp;
 import entity.block.SolidTile;
-import entity.block.PowerUp.Type;
 import entity.character.Player;
+import main.Sound.Sounditem;
 import util.InputHandler;
 import util.MapElement;
 import util.MapGenerator;
@@ -71,7 +70,7 @@ public class Stage {
                         tiles[pos] = new BreakableTile(gamePanel, i * tileSize,
                                 j * tileSize,
                                 this);
-                        ((BreakableTile) tiles[pos]).setPowerUp(Type.skates);
+                        ((BreakableTile) tiles[pos]).setPowerUp(mapGenerator.rafflePowerUp());
                         break;
                     case groundTile:
                         tiles[pos] = new BackgroundTile(gamePanel, i * tileSize,

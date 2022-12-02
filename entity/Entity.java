@@ -3,6 +3,7 @@ package entity;
 import java.awt.Graphics2D;
 
 import main.GamePanel;
+import util.CollisionHandler.Vector2D;
 
 abstract public class Entity implements Collider {
     protected int x, y, width, height, location;
@@ -35,6 +36,13 @@ abstract public class Entity implements Collider {
 
     public int getLocationY() {
         return (location / gamePanel.getMaxScreenColumns()) * gamePanel.getTileSize();
+    }
+
+    public int getCenterLocation() {
+        Vector2D center = getCenter();
+        int column = (int) (center.x / gamePanel.getTileSize());
+        int row = (int) (center.y / gamePanel.getTileSize());
+        return column + row * gamePanel.getMaxScreenColumns();
     }
 
     public void setSpatialProperties(int x, int y, int width, int height) {

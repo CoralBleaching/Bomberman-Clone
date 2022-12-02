@@ -25,6 +25,15 @@ public class CollisionHandler {
         return (result) ? Action.stop : Action.none;
     }
 
+    public static Action rectangularCollision(CollisionBox box1, CollisionBox box2) {
+        boolean result = false;
+        result |= collideRectFromLeft(box1, box2);
+        result |= collideRectFromTop(box2, box1);
+        result |= collideRectFromLeft(box2, box1);
+        result |= collideRectFromTop(box1, box2);
+        return (result) ? Action.stop : Action.none;
+    }
+
     public static boolean collideRectFromLeft(CollisionBox leftBox, CollisionBox rightBox) {
         if (leftBox.x + leftBox.width > rightBox.x && leftBox.x < rightBox.x) {
             if (leftBox.x > rightBox.x + rightBox.width)
