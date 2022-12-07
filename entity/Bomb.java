@@ -9,7 +9,7 @@ import javax.imageio.ImageIO;
 import util.Tint;
 import util.CollisionHandler;
 import util.CollisionHandler.Vector2D;
-
+import entity.Flame.Type;
 import entity.character.Player;
 import main.GamePanel;
 import main.Stage;
@@ -173,40 +173,45 @@ public class Bomb extends Entity implements Explodable {
         player.setnBombs(player.getnBombs() - 1);
         gamePanel.playSE(Sounditem.explosion);
 
-        Flame centerFlame = new Flame(gamePanel, x, y, width, height, stage);
+        Flame centerFlame = new Flame(gamePanel, x, y, width, height, stage, Type.center, null);
         stage.getFlames()[location] = centerFlame;
-        var characters = centerFlame.checkForCharacterCollisions();
-        for (var character : characters)
-            character.explode();
+        // var characters = centerFlame.checkForCharacterCollisions();
+        // for (var character : characters)
+        // character.explode();
 
         int ncols = gamePanel.getMaxScreenColumns();
         int tileSize = gamePanel.getTileSize();
         Flame newFlame = null;
         int newLocation = -1;
+        Type type;
         Direction[] directions = Direction.values();
         for (Direction direction : directions) {
             for (int i = 1; i <= power; i++) {
+                if (i == power)
+                    type = Type.edge;
+                else
+                    type = Type.middle;
                 if (direction == Direction.DOWN) {
                     newLocation = location + ncols * i;
                     if (newLocation >= gamePanel.getGridLength())
                         break;
-                    newFlame = new Flame(gamePanel, x, y + tileSize * i, width, height, stage);
+                    newFlame = new Flame(gamePanel, x, y + tileSize * i, width, height, stage, type, Direction.DOWN);
                 } else if (direction == Direction.LEFT) {
                     newLocation = location - 1 * i;
                     if (newLocation % ncols == ncols - 1 || newLocation < 0)
                         break;
-                    newFlame = new Flame(gamePanel, x - tileSize * i, y, width, height, stage);
+                    newFlame = new Flame(gamePanel, x - tileSize * i, y, width, height, stage, type, Direction.LEFT);
                 } else if (direction == Direction.RIGHT) {
                     newLocation = location + 1 * i;
                     if (newLocation % ncols == 0 || newLocation > gamePanel.getGridLength())
                         break;
-                    newFlame = new Flame(gamePanel, x + tileSize * i, y, width, height, stage);
+                    newFlame = new Flame(gamePanel, x + tileSize * i, y, width, height, stage, type, Direction.RIGHT);
                 } else// if (direction == Direction.UP)
                 {
                     newLocation = location - ncols * i;
                     if (newLocation < 0)
                         break;
-                    newFlame = new Flame(gamePanel, x, y - tileSize * i, width, height, stage);
+                    newFlame = new Flame(gamePanel, x, y - tileSize * i, width, height, stage, type, Direction.UP);
                 }
                 if (!newFlame.checkForCollisions())
                     stage.getFlames()[newLocation] = newFlame;
