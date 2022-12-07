@@ -8,7 +8,9 @@ import entity.block.BackgroundTile;
 import entity.block.Block;
 import entity.block.BreakableTile;
 import entity.block.SolidTile;
+import entity.character.Character;
 import entity.character.Player;
+import entity.character.baddie.BaseBaddie;
 import main.Sound.Sounditem;
 import util.InputHandler;
 import util.MapElement;
@@ -30,6 +32,7 @@ public class Stage {
     private Bomb[] bombs;
     private Block[] tiles;
     private Flame[] flames;
+    private Character[] baddies;
 
     public Stage(GamePanel gamePanel, InputHandler inputHandler) {
         this.gamePanel = gamePanel;
@@ -54,6 +57,12 @@ public class Stage {
         tiles = new Block[gridLength];
         bombs = new Bomb[gridLength];
         flames = new Flame[gridLength];
+
+        ///////////////////////////////////////
+        baddies = new Character[6];
+        int baddieIdx = 0;
+        ///////////////////////////////////////
+
         for (int j = 0; j < height; j++) {
             for (int i = 0; i < width; i++) {
                 int pos = i + j * width;
@@ -72,10 +81,12 @@ public class Stage {
                                 this);
                         ((BreakableTile) tiles[pos]).setPowerUp(mapGenerator.rafflePowerUp());
                         break;
+                    case baddie:
+                        baddies[baddieIdx] = new BaseBaddie(this, gamePanel, i * tileSize, j * tileSize, tileSize,
+                                tileSize, baddieIdx++);
                     case groundTile:
                         tiles[pos] = new BackgroundTile(gamePanel, i * tileSize,
                                 j * tileSize);
-                    case enemy:
                         break;
                 }
             }
@@ -94,6 +105,10 @@ public class Stage {
             if (flames[i] != null)
                 flames[i].update();
         }
+        for (var baddie : baddies) {
+            if (baddie != null)
+                baddie.update();
+        }
         if (bRoundStarted)
             player.update();
         else if (++nStartFrames > 30)
@@ -108,7 +123,15 @@ public class Stage {
             if (bombs[i] != null)
                 bombs[i].draw(graphics);
         }
+        for (var baddie : baddies) {
+            if (baddie != null)
+                baddie.draw(graphics);
+        }
         player.draw(graphics);
+    }
+
+    public Character[] getBaddies() {
+        return baddies;
     }
 
     public Bomb[] getBombs() {

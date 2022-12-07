@@ -28,7 +28,7 @@ public class Player extends Character {
     private InputHandler inputHandler;
 
     private final static int nPlayerStartingNBombs = 9;
-    private final static int nPlayerSartingFlamePower = 2;
+    private final static int nPlayerSartingFlamePower = 4;
     private final static int nPlayerStartingSpeed = 3;
     private final static int nPlayerSpritesNumber = 8;
     private final static String sSpritesPath = "resources/player/";

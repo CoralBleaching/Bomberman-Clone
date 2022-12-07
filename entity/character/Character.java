@@ -20,7 +20,7 @@ abstract public class Character extends Entity implements Explodable {
     protected Direction direction;
     protected int spritesNumber;
     protected int nAnimationStep, nFrameCounter;
-    protected int nTintLevel, nTintStep;
+    protected int nTintLevel, nTintStep, nFinalTintLevel;
     protected Stage stage;
     protected State state;
 

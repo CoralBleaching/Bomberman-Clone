@@ -54,7 +54,7 @@ public class Menu {
     }
 
     public void update() {
-        if (++nFrameCounter > 9999)
+        if (++nFrameCounter > 999)
             nFrameCounter = 0;
         if (inputHandler.down) {
             if (lastKeyPressed == Direction.DOWN)
@@ -80,7 +80,8 @@ public class Menu {
         }
         if (inputHandler.bomb) {
             if (lastKeyPressed == null)
-                return;
+                if (nFrameCounter < buttonDelay)
+                    return;
             buttons.get(kIndexFocused).execute();
             nFrameCounter = 0;
             lastKeyPressed = null;

@@ -16,6 +16,7 @@ public class MapGenerator {
     double cutoff;
     int nPowerUps;
     MapElement val;
+    ArrayList<Integer> groundTilePos;
     ArrayList<Integer> breakableTilePos;
 
     public MapGenerator(GamePanel gamePanel, double frequency, double cutoff, long seed, int nPowerUps) {
@@ -26,6 +27,7 @@ public class MapGenerator {
         xOffset = 0;
         yOffset = 0;
         this.seed = seed;
+        groundTilePos = new ArrayList<Integer>();
         breakableTilePos = new ArrayList<Integer>();
     }
 
@@ -49,6 +51,7 @@ public class MapGenerator {
                         breakableTilePos.add(pos);
                     } else {
                         map[pos] = MapElement.groundTile;
+                        groundTilePos.add(pos);
                     }
                 }
                 xOffset += frequency;
@@ -63,12 +66,16 @@ public class MapGenerator {
         breakableTilePos
                 .subList(0, nPowerUps)
                 .forEach(i -> map[i] = MapElement.powerup);
+        Collections.shuffle(groundTilePos);
+        groundTilePos
+                .subList(0, 6)
+                .forEach(i -> map[i] = MapElement.baddie);
     }
 
     public Type rafflePowerUp() {
-        var val = Type.values();
-        var len = val.length;
-        var i = gamePanel.rng.nextInt(0, len);
+        Type[] val = Type.values();
+        int len = val.length;
+        int i = gamePanel.rng.nextInt(0, len);
         System.out.println(val[i]);
         return val[i];
     }
